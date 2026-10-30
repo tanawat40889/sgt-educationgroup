@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SGT Education – เกมใบ้คำ</title>
+<style>
+:root{
+  --bg:#0f1226; --bg2:#1a1f3d; --fg:#f5f6ff; --mut:#9aa0c7;
+  --acc:#ffb703; --ok:#2ecc71; --bad:#ff5d73; --card:#232850;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:radial-gradient(1200px 700px at 50% -10%,var(--bg2),var(--bg));
+  color:var(--fg);
+  font-family:"Noto Sans Thai","Sarabun","Thonburi","Helvetica Neue",system-ui,sans-serif;
+  overflow:hidden;
+}
+button{font:inherit;color:inherit;cursor:pointer;border:0;border-radius:14px;padding:.7em 1.4em;background:var(--card);transition:transform .08s,background .15s}
+button:hover{background:#2d3466}
+button:active{transform:scale(.97)}
+button.pri{background:var(--acc);color:#1b1b1b;font-weight:700}
+button.pri:hover{background:#ffc833}
+button.ok{background:var(--ok);color:#06210f;font-weight:700}
+button.bad{background:var(--bad);color:#2a0008;font-weight:700}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:3vmin;text-align:center}
+.screen.on{display:flex}
+h1{font-size:clamp(2rem,6vw,4.5rem);line-height:1.15}
+h2{font-size:clamp(1.6rem,4vw,3rem)}
+.sub{color:var(--mut);font-size:clamp(1rem,2vw,1.5rem);margin-top:.6em}
+.rules{margin:4vmin 0;text-align:left;font-size:clamp(1rem,2.2vw,1.6rem);line-height:1.7;background:var(--card);padding:2.5vmin 4vmin;border-radius:20px;max-width:900px}
+.rules li{margin-left:1.2em}
+.row{display:flex;gap:1.2vmin;flex-wrap:wrap;justify-content:center}
+
+/* game */
+#game{justify-content:flex-start;padding:0}
+.top{width:100%;display:flex;align-items:center;justify-content:space-between;padding:1.5vmin 3vmin;font-size:clamp(1rem,2vw,1.6rem);color:var(--mut)}
+.top b{color:var(--fg)}
+#timer{font-size:clamp(2rem,5vw,4rem);font-weight:800;color:var(--acc);min-width:2.5ch;font-variant-numeric:tabular-nums}
+#timer.low{color:var(--bad);animation:pulse .6s infinite alternate}
+@keyframes pulse{to{transform:scale(1.15)}}
+.stage{flex:1;width:100%;min-height:0;display:flex;align-items:center;justify-content:center;position:relative;padding:0 3vmin}
+#pic{max-width:100%;max-height:100%;object-fit:contain;border-radius:20px;box-shadow:0 20px 60px #0008}
+#ready{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2vmin;background:var(--bg);z-index:2}
+#ready .big{font-size:clamp(5rem,18vw,14rem);font-weight:800;color:var(--acc);line-height:1}
+#res{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:24px;padding:.2em 1em;font-size:clamp(3rem,10vw,8rem);font-weight:800;z-index:3;white-space:nowrap;box-shadow:0 20px 60px #000a}
+#res.ok{background:var(--ok);color:#06210f}
+#res.bad{background:var(--bad);color:#2a0008}
+.hidden{display:none!important}
+.menu{position:fixed;top:1.2vmin;left:1.5vmin;z-index:10;color:var(--mut);text-decoration:none;font-size:1rem;background:var(--card);padding:.4em .9em;border-radius:99px}
+.menu:hover{color:var(--fg)}
+body:has(#game.on) .menu,body:has(#end.on) .menu{display:none}
+.bar{width:100%;display:flex;gap:1.2vmin;justify-content:center;padding:2vmin;flex-wrap:wrap}
+.bar button{font-size:clamp(1rem,2vw,1.5rem)}
+.kbd{font-size:.7em;color:var(--mut);margin-top:1vmin}
+
+/* setup */
+#setup{justify-content:flex-start;overflow:auto;padding:4vmin}
+.cfg{display:flex;gap:2vmin;align-items:center;margin:2vmin 0;font-size:1.2rem}
+.cfg input{width:5em;font:inherit;padding:.3em .5em;border-radius:10px;border:2px solid var(--card);background:var(--bg);color:var(--fg)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:2vmin;width:100%;max-width:1200px;margin-bottom:4vmin}
+.item{background:var(--card);border-radius:16px;padding:1.2vmin;display:flex;flex-direction:column;gap:1vmin}
+.item img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px}
+.item label{font-size:.85rem;color:var(--mut);display:flex;gap:.5em;align-items:center}
+.n{color:var(--mut);font-size:.85rem;text-align:left}
+
+/* end */
+#score{font-size:clamp(4rem,14vw,10rem);font-weight:800;color:var(--acc);line-height:1}
+</style>
+</head>
+<body>
+<a class="menu" href="../index.html">← เมนู</a>
+
+<!-- Start -->
+<section id="start" class="screen on">
+  <h1>🎯 เกมใบ้คำ</h1>
+  <p class="sub">SGT Education Group</p>
+  <ul class="rules">
+    <li>น้อง 1 คนออกมาด้านหน้า <b>หันหลังให้จอ</b></li>
+    <li>เพื่อนๆ ที่เห็นรูปบนจอ ช่วยกัน <b>ใบ้คำ</b> ให้คนหน้าจอทาย</li>
+    <li>ห้ามพูดคำตอบตรงๆ ห้ามสะกดคำ</li>
+    <li>กด <b>✓ ตอบถูก</b> หรือ <b>✗ ตอบผิด</b> — หมดเวลานับเป็นตอบผิด</li>
+  </ul>
+  <div class="row">
+    <button class="pri" id="btnStart">▶ เริ่มเกม</button>
+    <button id="btnSetup">⚙ ตั้งค่า</button>
+  </div>
+</section>
+
+<!-- Setup -->
+<section id="setup" class="screen">
+  <h2>ตั้งค่า</h2>
+  <div class="cfg">
+    <label>เวลาต่อรอบ (วินาที) <input type="number" id="cfgTime" min="10" max="600"></label>
+    <label><input type="checkbox" id="cfgShuffle"> สุ่มลำดับ</label>
+  </div>
+  <p class="sub" style="margin-bottom:2vmin">ติ๊ก “ใช้” เพื่อเลือกรูปที่จะเล่น (บันทึกอัตโนมัติ)</p>
+  <div class="grid" id="grid"></div>
+  <div class="row">
+    <button class="pri" id="btnBack">← กลับ</button>
+  </div>
+</section>
+
+<!-- Game -->
+<section id="game" class="screen">
+  <div class="top">
+    <div>รอบที่ <b id="rn">1</b>/<b id="rt">1</b></div>
+    <div id="timer">60</div>
+    <div><span style="color:var(--ok)">✓ <b id="sc">0</b></span> &nbsp; <span style="color:var(--bad)">✗ <b id="sw">0</b></span></div>
+  </div>
+  <div class="stage">
+    <img id="pic" alt="">
+    <div id="ready">
+      <h2>เชิญน้องออกมาหน้าห้อง</h2>
+      <p class="sub">หันหลังให้จอ แล้วกด “เริ่ม” เมื่อพร้อม</p>
+      <button class="pri" id="btnGo" style="font-size:2rem">▶ เริ่มรอบนี้</button>
+      <p class="kbd">กด Space</p>
+    </div>
+    <div id="res" class="hidden"></div>
+  </div>
+  <div class="bar" id="bar"></div>
+</section>
+
+<!-- End -->
+<section id="end" class="screen">
+  <h1>จบเกม 🎉</h1>
+  <p class="sub">ตอบถูก</p>
+  <div id="score">0</div>
+  <p class="sub" id="of"></p>
+  <div class="row" style="margin-top:4vmin">
+    <button class="pri" id="btnAgain">↻ เล่นอีกครั้ง</button>
+    <button id="btnHome">หน้าแรก</button>
+  </div>
+</section>
+
+<script>
+// ---- settings saved in localStorage ----
+const IMG = {/*IMGS*/};
+const N = 17;
+const KEY = "sgt-edu-heads-up-v1";
+
+const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch {} };
+const st = Object.assign({time:60, shuffle:true, off:[]}, load());
+
+const $ = id => document.getElementById(id);
+const show = id => { document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === id)); };
+
+// ---- setup ----
+function buildSetup(){
+  $("cfgTime").value = st.time;
+  $("cfgShuffle").checked = st.shuffle;
+  const g = $("grid"); g.innerHTML = "";
+  for (let i = 1; i <= N; i++){
+    const d = document.createElement("div"); d.className = "item";
+    d.innerHTML = `<div class="n">#${i}</div><img src="${IMG[i]}" alt="">
+      <label><input type="checkbox" ${st.off.includes(i)?"":"checked"}> ใช้</label>`;
+    d.querySelector("input[type=checkbox]").onchange = e => {
+      st.off = st.off.filter(x => x !== i); if (!e.target.checked) st.off.push(i); save();
+    };
+    g.appendChild(d);
+  }
+}
+$("cfgTime").onchange = e => { st.time = Math.max(10, +e.target.value || 60); save(); };
+$("cfgShuffle").onchange = e => { st.shuffle = e.target.checked; save(); };
+$("btnSetup").onclick = () => { buildSetup(); show("setup"); };
+$("btnBack").onclick = () => show("start");
+$("btnHome").onclick = () => show("start");
+
+// ---- game ----
+let q = [], i = 0, score = 0, wrong = 0, phase = "ready", left = 0, tm = null;
+
+function start(){
+  q = []; for (let k = 1; k <= N; k++) if (!st.off.includes(k)) q.push(k);
+  if (!q.length) { alert("ยังไม่ได้เลือกรูป"); return; }
+  if (st.shuffle) for (let k = q.length - 1; k > 0; k--){ const j = Math.floor(Math.random() * (k + 1)); [q[k], q[j]] = [q[j], q[k]]; }
+  i = 0; score = 0; wrong = 0; $("rt").textContent = q.length; $("sc").textContent = 0; $("sw").textContent = 0;
+  show("game"); ready();
+}
+function bar(items){
+  const b = $("bar"); b.innerHTML = "";
+  items.forEach(([t, cls, fn]) => { const x = document.createElement("button"); x.textContent = t; if (cls) x.className = cls; x.onclick = fn; b.appendChild(x); });
+}
+function ready(){
+  phase = "ready"; clearInterval(tm);
+  $("rn").textContent = i + 1;
+  $("pic").removeAttribute("src");
+  $("ready").classList.remove("hidden");
+  $("res").classList.add("hidden");
+  $("timer").textContent = st.time; $("timer").classList.remove("low");
+  bar([["ข้ามรอบนี้", "", next]]);
+}
+function play(){
+  phase = "play"; left = st.time;
+  $("pic").src = IMG[q[i]];
+  $("ready").classList.add("hidden");
+  $("timer").textContent = left;
+  bar([["✓ ตอบถูก (C)", "ok", () => result(true)], ["✗ ตอบผิด (X)", "bad", () => result(false)]]);
+  clearInterval(tm);
+  tm = setInterval(() => {
+    left--; $("timer").textContent = left; $("timer").classList.toggle("low", left <= 10);
+    if (left <= 0) result(false, true);
+  }, 1000);
+}
+function result(ok, timeout){
+  if (phase !== "play") return;
+  clearInterval(tm); phase = "result";
+  if (ok){ score++; $("sc").textContent = score; } else { wrong++; $("sw").textContent = wrong; }
+  const r = $("res"); r.className = ok ? "ok" : "bad";
+  r.textContent = ok ? "✓ ตอบถูก!" : timeout ? "✗ หมดเวลา" : "✗ ตอบผิด";
+  bar([[i + 1 >= q.length ? "จบเกม →" : "รอบต่อไป → (Space)", "pri", next]]);
+}
+function next(){
+  clearInterval(tm); i++;
+  if (i >= q.length){ $("score").textContent = score; $("of").textContent = `จาก ${q.length} รูป · ตอบผิด ${wrong}`; show("end"); return; }
+  ready();
+}
+
+$("btnStart").onclick = start;
+$("btnAgain").onclick = start;
+$("btnGo").onclick = play;
+document.addEventListener("keydown", e => {
+  if (!$("game").classList.contains("on")) return;
+  if (e.key === " ") { e.preventDefault(); if (phase === "ready") play(); else if (phase === "result") next(); }
+  else if (e.key === "c" || e.key === "C") result(true);
+  else if (e.key === "x" || e.key === "X") result(false);
+  else if (e.key === "ArrowRight") next();
+  else if (e.key === "f" || e.key === "F") { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); }
+});
+</script>
+</body>
+</html>

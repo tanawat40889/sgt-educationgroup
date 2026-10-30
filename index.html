@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0f1226" />
+<title>เกม SGT Education Group</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --page:#0f1226; --shell:#1a1f3d; --panel:#272d5a; --deep:#12152e;
+  --text:#f5f6ff; --mute:#9aa0c7; --acc:#ffb703; --cream:#fff0c2; --r:28px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--page)}
+body{margin:0;min-height:100vh;color:var(--text);font-family:'Prompt','Noto Sans Thai','Thonburi',sans-serif;
+  background:radial-gradient(80vmax 60vmax at 10% -10%,rgba(255,183,3,.14),transparent 60%),var(--page);
+  padding:max(18px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}
+a{color:inherit;text-decoration:none}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--cream);outline-offset:2px}
+
+.shell{max-width:1240px;margin:0 auto;background:var(--shell);border-radius:40px;padding:22px;display:grid;grid-template-columns:230px minmax(0,1fr);gap:22px;
+  box-shadow:0 40px 90px rgba(0,0,0,.45)}
+
+.rail{background:var(--deep);border-radius:var(--r);padding:22px 16px;display:flex;flex-direction:column;gap:22px;align-self:start;position:sticky;top:22px}
+.brand{display:flex;flex-direction:column;gap:2px;padding:4px 10px}
+.brand b{font-size:30px;font-weight:800;color:var(--acc);line-height:1}
+.brand span{font-size:13px;color:var(--mute);letter-spacing:.04em}
+.group{display:flex;flex-direction:column;gap:6px}
+.label{font-size:13px;color:var(--mute);margin:0 0 4px 10px}
+.opt{display:flex;justify-content:space-between;align-items:center;border:0;border-radius:14px;padding:11px 14px;background:none;color:var(--mute);font-size:16px;cursor:pointer;text-align:left;transition:.15s}
+.opt:hover{background:rgba(255,255,255,.05);color:var(--text)}
+.opt.on{background:var(--acc);color:#1b1b1b;font-weight:600}
+.opt span{font-size:13px;opacity:.8}
+select{width:100%;border:0;border-radius:14px;padding:11px 14px;background:var(--panel);font-size:15px}
+
+main{min-width:0;display:flex;flex-direction:column;gap:26px}
+.top{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.hello{margin:0;flex:1 1 auto;font-size:clamp(22px,2.6vw,30px);font-weight:500;color:var(--acc)}
+.hello b{color:#fff;font-weight:700}
+.search{flex:0 1 380px;display:flex;align-items:center;gap:10px;background:var(--deep);border-radius:99px;padding:0 18px;height:50px;min-width:0}
+.search input{flex:1;min-width:0;background:none;border:0;font-size:16px;outline:none}
+.search input::placeholder{color:var(--mute)}
+
+.hero{position:relative;border-radius:var(--r);overflow:hidden;min-height:380px;padding:34px 36px;display:flex;flex-direction:column;gap:14px;background:var(--art);isolation:isolate}
+.hero::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,12,35,.7) 0%,rgba(10,12,35,.25) 55%,transparent 80%);z-index:-1}
+.hero .art{position:absolute;right:-10px;bottom:-40px;font-size:clamp(170px,20vw,280px);line-height:1;z-index:-1;transform:rotate(-8deg);filter:drop-shadow(0 30px 40px rgba(0,0,0,.35))}
+.pill{align-self:flex-start;background:var(--cream);color:#3a2a05;font-weight:600;font-size:15px;border-radius:99px;padding:7px 16px}
+.hero h1{margin:0;font-size:clamp(34px,4.4vw,56px);font-weight:800;line-height:1.08}
+.hero .desc{margin:0;max-width:30em;font-size:15.5px;line-height:1.6;color:#eef0ff}
+.hero ol{margin:0;padding-left:20px;max-width:32em;font-size:14.5px;line-height:1.65;color:#e4e7ff}
+.play{margin-top:auto;align-self:flex-start;display:inline-flex;align-items:center;gap:10px;background:#fff;color:#0f1226;font-weight:700;font-size:17px;border-radius:99px;padding:12px 24px 12px 14px;box-shadow:0 12px 30px rgba(0,0,0,.25);transition:transform .15s}
+.play:hover{transform:translateY(-2px)}
+.play i{width:32px;height:32px;border-radius:50%;background:var(--acc);color:#1b1b1b;display:grid;place-items:center;font-style:normal;font-size:13px}
+
+h2{margin:0 0 14px 4px;font-size:22px;font-weight:600}
+h2 span{color:var(--mute);font-weight:400;font-size:16px}
+.strip{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 4px 16px;scrollbar-width:thin;scrollbar-color:var(--panel) transparent}
+.card{flex:0 0 min(78vw,290px);height:320px;scroll-snap-align:start;border-radius:var(--r);position:relative;overflow:hidden;padding:22px;display:flex;flex-direction:column;justify-content:flex-end;background:var(--art);isolation:isolate;transition:transform .2s,box-shadow .2s}
+.card::before{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(8,10,28,.9) 0%,rgba(8,10,28,.25) 55%,transparent 80%);z-index:-1}
+.card .art{position:absolute;top:16px;right:-14px;font-size:140px;line-height:1;z-index:-2;transform:rotate(10deg);transition:transform .4s}
+.card:hover{transform:translateY(-4px);box-shadow:0 24px 40px rgba(0,0,0,.35)}
+.card:hover .art{transform:rotate(0) scale(1.06)}
+.card .m{font-size:13px;color:var(--cream);font-weight:500}
+.card h3{margin:4px 0 6px;font-size:21px;font-weight:700;line-height:1.2}
+.card p{margin:0;font-size:13.5px;line-height:1.5;color:#dfe2fa;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.empty{color:var(--mute);padding:30px 4px}
+
+@media (max-width:820px){
+  body{padding-left:10px;padding-right:10px}
+  .shell{grid-template-columns:1fr;padding:14px;border-radius:30px}
+  .rail{position:static;padding:16px;gap:14px}
+  .group{flex-direction:row;flex-wrap:wrap} .label{display:none}
+  .opt{flex:1 1 auto;justify-content:center;gap:6px;padding:9px 12px;font-size:15px}
+  .search{flex-basis:100%}
+  .hero{min-height:440px;padding:26px 22px} .hero .art{font-size:170px;opacity:.55}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="rail">
+    <div class="brand"><b>SGT</b><span>EDUCATION GROUP</span></div>
+    <div class="group" id="type">
+      <p class="label">ประเภท</p>
+      <button class="opt on" data-v="all">ทั้งหมด <span></span></button>
+      <button class="opt" data-v="guess">ทายคำ / ใบ้คำ <span></span></button>
+    </div>
+    <div class="group">
+      <p class="label">เรียงลำดับ</p>
+      <select id="sort" aria-label="เรียงลำดับ">
+        <option value="new">ใหม่สุดก่อน</option><option value="old">เก่าสุดก่อน</option><option value="name">ชื่อ ก–ฮ</option>
+      </select>
+    </div>
+  </aside>
+
+  <main>
+    <div class="top">
+      <h1 class="hello" id="hello"></h1>
+      <label class="search"><span aria-hidden="true">🔍</span><input id="q" type="search" placeholder="ค้นหาเกม เช่น ใบ้คำ" /></label>
+    </div>
+    <section class="hero" id="hero"></section>
+    <section><h2 id="secTitle"></h2><div id="list"></div></section>
+  </main>
+</div>
+
+<script>
+// เพิ่มเกมใหม่ไว้ใน array นี้ (path = โฟลเดอร์เกม, cat = ประเภท, added = วันที่เพิ่ม ใช้เรียงลำดับ)
+const GAMES = [
+  {
+    cat:'guess', added:'2026-10', path:'headsup/index.html', icon:'🎯', title:'เกมใบ้คำ',
+    art:'linear-gradient(135deg,#ffb703 0%,#fb7a2c 45%,#8a2a6e 100%)',
+    desc:'น้องออกมาทีละคน หันหลังให้จอ ส่วนเพื่อนๆ เห็นรูปบนจอแล้วช่วยกันใบ้คำให้เพื่อนทาย มีจับเวลาและนับคะแนน',
+    steps:[
+      'น้อง 1 คนออกมาด้านหน้า หันหลังให้จอ แล้วกดเริ่ม',
+      'รูปขึ้นบนจอ เพื่อนๆ ช่วยกันใบ้คำ (ห้ามพูดคำตอบตรงๆ)',
+      'กด ✓ ตอบถูก (C) หรือ ✗ ตอบผิด (X) — หมดเวลานับเป็นตอบผิด',
+      'กด Space เพื่อไปรอบต่อไป จนครบทุกรูป แล้วดูสรุปคะแนน',
+    ],
+    tags:['ทีละคน','17 รูป','จับเวลา','ใบ้คำ'],
+  },
+];
+const CATS={guess:'ทายคำ / ใบ้คำ'};
+const MON=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const mLabel=ym=>{const [y,m]=ym.split('-').map(Number);return MON[m-1]+' '+(y+543)};
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const $=id=>document.getElementById(id);
+const sub=g=>CATS[g.cat]+' · '+mLabel(g.added);
+
+const F={q:'',type:'all',sort:'new'};
+const sorter={new:(a,b)=>b.added.localeCompare(a.added),old:(a,b)=>a.added.localeCompare(b.added),name:(a,b)=>a.title.localeCompare(b.title,'th')};
+const match=g=>{const q=F.q.trim().toLowerCase(); return !q||[g.title,g.desc,CATS[g.cat],...g.tags,...g.steps].join(' ').toLowerCase().includes(q)};
+const byType=g=>F.type==='all'||g.cat===F.type;
+const FEAT=[...GAMES].sort(sorter.new)[0]; // เกมล่าสุด แสดงเป็น hero
+
+function render(){
+  const browsing=F.q.trim()||F.type!=='all';
+  const hero=$('hero');
+  hero.hidden=browsing||!FEAT;
+  if(!hero.hidden){
+    hero.style.setProperty('--art',FEAT.art);
+    hero.innerHTML=`<span class="art" aria-hidden="true">${FEAT.icon}</span>
+      <span class="pill">🔥 เกมล่าสุด</span>
+      <h1>${esc(FEAT.title)}</h1>
+      <p class="desc">${esc(FEAT.desc)}</p>
+      <ol>${FEAT.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>
+      <a class="play" href="${FEAT.path}"><i>▶</i>เข้าเล่น</a>`;
+  }
+  const gs=GAMES.filter(g=>match(g)&&byType(g)&&(browsing||g!==FEAT)).sort(sorter[F.sort]);
+  $('secTitle').innerHTML=browsing?`ผลลัพธ์ <span>(${gs.length})</span>`:'เกมอื่นๆ';
+  $('secTitle').hidden=!gs.length&&!browsing;
+  $('list').innerHTML=gs.length?`<div class="strip">${gs.map(g=>`
+    <a class="card" href="${g.path}" style="--art:${g.art}">
+      <span class="art" aria-hidden="true">${g.icon}</span>
+      <span class="m">${esc(sub(g))}</span>
+      <h3>${esc(g.title)}</h3>
+      <p>${esc(g.desc)}</p>
+    </a>`).join('')}</div>`:browsing?'<p class="empty">ไม่พบเกมที่ค้นหา</p>':'';
+}
+
+const count={all:GAMES.length};for(const g of GAMES)count[g.cat]=(count[g.cat]||0)+1;
+document.querySelectorAll('#type .opt').forEach(b=>b.querySelector('span').textContent=count[b.dataset.v]||0);
+$('type').onclick=e=>{const b=e.target.closest('.opt'); if(!b) return; F.type=b.dataset.v; document.querySelectorAll('#type .opt').forEach(x=>x.classList.toggle('on',x===b)); render()};
+$('sort').onchange=e=>{F.sort=e.target.value;render()};
+$('q').oninput=e=>{F.q=e.target.value;render()};
+
+const h=new Date().getHours();
+$('hello').innerHTML=`${h<12?'สวัสดีตอนเช้า':h<17?'สวัสดีตอนบ่าย':h<20?'สวัสดีตอนเย็น':'สวัสดีตอนค่ำ'}, <b>SGT Education</b>`;
+render();
+</script>
+</body>
+</html>
